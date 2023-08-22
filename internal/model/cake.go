@@ -1,7 +1,6 @@
 package model
 
 import (
-	"database/sql"
 	"time"
 )
 
@@ -9,10 +8,10 @@ import (
 type Cake struct {
 	ID          int
 	Title       string
-	Description sql.NullString
-	Rating      float64
-	Image       sql.NullString
+	Description *string
+	Rating      float32
+	Image       *string
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
-	DeletedAt   sql.NullTime
+	DeletedAt   *time.Time
 }
