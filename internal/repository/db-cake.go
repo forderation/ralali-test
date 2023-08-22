@@ -66,7 +66,7 @@ func NewCakeDBRepository(db *sql.DB, tableName string) *CakeDBRepository {
 	}
 }
 
-func (repo *CakeDBRepository) GetCakes(ctx context.Context, param model.RepoGetCakesParam) ([]model.Cake, error) {
+func (repo *CakeDBRepository) GetCakes(ctx context.Context, param model.GetCakesQuery) ([]model.Cake, error) {
 	stmt := repo.queryPrepared[GET_CAKES_STMT]
 	rows, err := stmt.QueryContext(ctx, param.Limit, param.Offset)
 	if err != nil {
@@ -124,14 +124,14 @@ func (repo *CakeDBRepository) GetCake(ctx context.Context, id int) (*model.Cake,
 	return nil, nil
 }
 
-func (repo *CakeDBRepository) InsertCake(ctx context.Context, param model.RepoCakeParam) error {
+func (repo *CakeDBRepository) InsertCake(ctx context.Context, param model.CakePayloadQuery) error {
 	stmt := repo.queryPrepared[INSERT_CAKE_STMT]
 	timeCreated := time.Now().UTC()
 	_, err := stmt.ExecContext(ctx, param.Title, param.Description, param.Rating, param.Image, timeCreated, timeCreated)
 	return err
 }
 
-func (repo *CakeDBRepository) UpdateCake(ctx context.Context, id int, param model.RepoCakeParam) error {
+func (repo *CakeDBRepository) UpdateCake(ctx context.Context, id int, param model.CakePayloadQuery) error {
 	stmt := repo.queryPrepared[UPDATE_CAKE_STMT]
 	timeUpdated := time.Now().UTC()
 	_, err := stmt.ExecContext(ctx, param.Title, param.Description, param.Rating, param.Image, timeUpdated, id)
