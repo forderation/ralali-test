@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -17,16 +18,18 @@ import (
 	"github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 	_ "go.uber.org/mock/mockgen/model"
 )
 
 func main() {
-	mySqlDB := initMysqlDB("root:root@tcp(127.0.0.1:3306)/ralali?parseTime=true")
-	cakeDBRepository := repository.NewCakeDBRepository(mySqlDB, "cakes")
+	loadConfigFile()
+	mySqlDB := initMysqlDB(viper.GetString("db_dsn"))
+	cakeDBRepository := repository.NewCakeDBRepository(mySqlDB, viper.GetString("cakes_table"))
 	cakeUsecase := usecase.NewCakeUsecase(cakeDBRepository)
 	cakeDelivery := delivery.NewCakeDelivery(cakeUsecase)
 	routes := initRoute(cakeDelivery)
-	address := ":8081"
+	address := viper.GetString("service_addr")
 	srv := &http.Server{Addr: address, Handler: routes}
 	go func() {
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
@@ -47,6 +50,17 @@ func main() {
 	case <-ctx.Done():
 	}
 	log.Println("service exiting")
+}
+
+func loadConfigFile() {
+	filePath := fmt.Sprintf("config.toml")
+	viper.SetConfigType("toml")
+	viper.SetConfigFile(filePath)
+	err := viper.ReadInConfig()
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Println("using config file:", viper.ConfigFileUsed())
 }
 
 func initRoute(cakeDelivery *delivery.CakeDelivery) *gin.Engine {
