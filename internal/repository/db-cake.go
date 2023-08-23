@@ -24,7 +24,7 @@ type CakeDBRepository struct {
 	queryPrepared map[int]*sql.Stmt
 }
 
-func NewCakeDBRepository(db *sql.DB, tableName string) *CakeDBRepository {
+func NewCakeDBRepository(db *sql.DB, tableName string) CakeDBInterface {
 	if db == nil {
 		logrus.Panic("db param for NewCakeDBRepository is nil")
 	}

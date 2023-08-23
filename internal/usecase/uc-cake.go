@@ -14,10 +14,10 @@ import (
 )
 
 type CakeUsecase struct {
-	dbCakeRepository *repository.CakeDBRepository
+	dbCakeRepository repository.CakeDBInterface
 }
 
-func NewCakeUsecase(dbCakeRepository *repository.CakeDBRepository) *CakeUsecase {
+func NewCakeUsecase(dbCakeRepository repository.CakeDBInterface) CakeUsecaseInterface {
 	return &CakeUsecase{
 		dbCakeRepository: dbCakeRepository,
 	}
@@ -102,7 +102,7 @@ func (uc *CakeUsecase) GetDetailCake(ctx context.Context, id int) (*model.CakeRe
 			Err:            fmt.Errorf("cake data with id %d not found", id),
 		}
 	}
-	response := uc.MapCakeDataResponse(*cake)
+	response := mapCakeDataResponse(*cake)
 	return &response, nil
 }
 
@@ -156,13 +156,13 @@ func (uc *CakeUsecase) GetCakes(ctx context.Context, param model.GetCakesUsecase
 		Data: make([]model.CakeResponse, 0),
 	}
 	for _, v := range cakes {
-		data := uc.MapCakeDataResponse(v)
+		data := mapCakeDataResponse(v)
 		response.Data = append(response.Data, data)
 	}
 	return &response, nil
 }
 
-func (uc *CakeUsecase) MapCakeDataResponse(cake model.Cake) model.CakeResponse {
+func mapCakeDataResponse(cake model.Cake) model.CakeResponse {
 	return model.CakeResponse{
 		ID:          cake.ID,
 		Title:       cake.Title,

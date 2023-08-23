@@ -17,6 +17,7 @@ import (
 	"github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/sirupsen/logrus"
+	_ "go.uber.org/mock/mockgen/model"
 )
 
 func main() {
@@ -24,18 +25,9 @@ func main() {
 	cakeDBRepository := repository.NewCakeDBRepository(mySqlDB, "cakes")
 	cakeUsecase := usecase.NewCakeUsecase(cakeDBRepository)
 	cakeDelivery := delivery.NewCakeDelivery(cakeUsecase)
-
-	baseRoot := gin.Default()
-	baseRoot.Use(util.CORSMiddleware())
-	cakeRoutes := baseRoot.Group("/cakes")
-	cakeRoutes.GET("", cakeDelivery.GetCakes)
-	cakeRoutes.GET("/:id", cakeDelivery.GetCake)
-	cakeRoutes.POST("", cakeDelivery.CreateCake)
-	cakeRoutes.PUT("/:id", cakeDelivery.UpdateCake)
-	cakeRoutes.DELETE("/:id", cakeDelivery.DeleteCake)
-
+	routes := initRoute(cakeDelivery)
 	address := ":8081"
-	srv := &http.Server{Addr: address, Handler: baseRoot}
+	srv := &http.Server{Addr: address, Handler: routes}
 	go func() {
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatalf("listen: %s\n", err)
@@ -55,6 +47,18 @@ func main() {
 	case <-ctx.Done():
 	}
 	log.Println("service exiting")
+}
+
+func initRoute(cakeDelivery *delivery.CakeDelivery) *gin.Engine {
+	baseRoot := gin.Default()
+	baseRoot.Use(util.CORSMiddleware())
+	cakeRoutes := baseRoot.Group("/cakes")
+	cakeRoutes.GET("", cakeDelivery.GetCakes)
+	cakeRoutes.GET("/:id", cakeDelivery.GetCake)
+	cakeRoutes.POST("", cakeDelivery.CreateCake)
+	cakeRoutes.PUT("/:id", cakeDelivery.UpdateCake)
+	cakeRoutes.DELETE("/:id", cakeDelivery.DeleteCake)
+	return baseRoot
 }
 
 func initMysqlDB(dsn string) *sql.DB {

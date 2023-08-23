@@ -10,10 +10,10 @@ import (
 )
 
 type CakeDelivery struct {
-	cakeUsecase *usecase.CakeUsecase
+	cakeUsecase usecase.CakeUsecaseInterface
 }
 
-func NewCakeDelivery(cakeUsecase *usecase.CakeUsecase) *CakeDelivery {
+func NewCakeDelivery(cakeUsecase usecase.CakeUsecaseInterface) *CakeDelivery {
 	return &CakeDelivery{
 		cakeUsecase: cakeUsecase,
 	}
