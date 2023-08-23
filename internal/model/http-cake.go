@@ -5,11 +5,13 @@ import (
 	"strings"
 )
 
+// ApiGetCakesQuery: request validation model
 type ApiGetCakesQuery struct {
 	Page     int `form:"page"`
 	PageSize int `form:"page_size" binding:"required"`
 }
 
+// ApiMutationCakePayload: request validation model
 type ApiMutationCakePayload struct {
 	Title       string  `json:"title" binding:"required"`
 	Description *string `json:"description"`
