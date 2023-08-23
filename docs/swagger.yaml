@@ -1,0 +1,166 @@
+definitions:
+  model.ApiMutationCakePayload:
+    properties:
+      description:
+        type: string
+      image:
+        type: string
+      rating:
+        type: number
+      title:
+        type: string
+    required:
+    - rating
+    - title
+    type: object
+  model.CakeDeleteResponse:
+    properties:
+      id:
+        type: integer
+    type: object
+  model.CakeMutationResponse:
+    properties:
+      description:
+        type: string
+      image:
+        type: string
+      rating:
+        type: number
+      title:
+        type: string
+    type: object
+  model.CakeResponse:
+    properties:
+      created_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      image:
+        type: string
+      rating:
+        type: number
+      title:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  model.GetCakesResponse:
+    properties:
+      cakes:
+        items:
+          $ref: '#/definitions/model.CakeResponse'
+        type: array
+      meta:
+        $ref: '#/definitions/model.MetaPagination'
+    type: object
+  model.MetaPagination:
+    properties:
+      page_count:
+        type: integer
+      total_data:
+        type: integer
+    type: object
+info:
+  contact: {}
+paths:
+  /cakes:
+    get:
+      parameters:
+      - description: default page is at page 1
+        in: query
+        name: page
+        type: integer
+      - description: maximum value is 100
+        in: query
+        name: page_size
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.GetCakesResponse'
+      summary: GetCakes
+      tags:
+      - cakes
+    post:
+      parameters:
+      - description: body data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/model.ApiMutationCakePayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.CakeMutationResponse'
+      summary: CreateCake
+      tags:
+      - cakes
+  /cakes/{id}:
+    delete:
+      parameters:
+      - description: param id (cake record)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.CakeDeleteResponse'
+      summary: DeleteCake
+      tags:
+      - cakes
+    get:
+      parameters:
+      - description: param id (cake record)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.CakeResponse'
+      summary: GetCake
+      tags:
+      - cakes
+    put:
+      parameters:
+      - description: param id (cake record)
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: body data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/model.ApiMutationCakePayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.CakeMutationResponse'
+      summary: UpdateCake
+      tags:
+      - cakes
+swagger: "2.0"

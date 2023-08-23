@@ -11,6 +11,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/forderation/ralali-test/docs"
 	"github.com/forderation/ralali-test/internal/delivery"
 	"github.com/forderation/ralali-test/internal/repository"
 	"github.com/forderation/ralali-test/internal/usecase"
@@ -19,6 +20,8 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	_ "go.uber.org/mock/mockgen/model"
 )
 
@@ -28,6 +31,13 @@ func main() {
 	cakeDBRepository := repository.NewCakeDBRepository(mySqlDB, viper.GetString("cakes_table"))
 	cakeUsecase := usecase.NewCakeUsecase(cakeDBRepository)
 	cakeDelivery := delivery.NewCakeDelivery(cakeUsecase)
+
+	docs.SwaggerInfo.Title = "Ralali App"
+	docs.SwaggerInfo.Description = "ralali cake demo app"
+	docs.SwaggerInfo.Version = "1.0"
+	docs.SwaggerInfo.Host = "127.0.0.1:8081"
+	docs.SwaggerInfo.Schemes = []string{"http"}
+
 	routes := initRoute(cakeDelivery)
 	address := viper.GetString("service_addr")
 	srv := &http.Server{Addr: address, Handler: routes}
@@ -65,6 +75,7 @@ func loadConfigFile() {
 
 func initRoute(cakeDelivery *delivery.CakeDelivery) *gin.Engine {
 	baseRoot := gin.Default()
+	baseRoot.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	baseRoot.Use(util.CORSMiddleware())
 	cakeRoutes := baseRoot.Group("/cakes")
 	cakeRoutes.GET("", cakeDelivery.GetCakes)

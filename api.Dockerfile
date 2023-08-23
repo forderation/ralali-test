@@ -38,6 +38,7 @@ COPY --from=builder /app/main .
 
 # Copy files setting project to the Workdir
 COPY --from=builder /app/config.toml .
+COPY --from=builder /app/docs .
 
 # Expose port 3000 to the outside world
 EXPOSE 8081

@@ -19,6 +19,15 @@ func NewCakeDelivery(cakeUsecase usecase.CakeUsecaseInterface) *CakeDelivery {
 	}
 }
 
+// GetCakes godoc
+//
+//	@Summary	GetCakes
+//	@Tags		cakes
+//	@Param		page		query	integer	false	"default page is at page 1"
+//	@Param		page_size	query	integer	true	"maximum value is 100"
+//	@Produce	json
+//	@Success	200	{object}	model.GetCakesResponse
+//	@Router		/cakes [get]
 func (d *CakeDelivery) GetCakes(c *gin.Context) {
 	ctx := c.Request.Context()
 	var query model.ApiGetCakesQuery
@@ -30,6 +39,9 @@ func (d *CakeDelivery) GetCakes(c *gin.Context) {
 	if query.PageSize > 100 {
 		c.JSON(http.StatusBadRequest, model.JsonErrorResp{ErrorMessage: "maximum page_size is 100"})
 		return
+	}
+	if query.Page <= 0 {
+		query.Page = 1
 	}
 	response, errResponse := d.cakeUsecase.GetCakes(ctx, model.GetCakesUsecaseParam{
 		Page:     query.Page,
@@ -43,6 +55,14 @@ func (d *CakeDelivery) GetCakes(c *gin.Context) {
 	return
 }
 
+// GetCake godoc
+//
+//	@Summary	GetCake
+//	@Tags		cakes
+//	@Param		id	path	string	true	"param id (cake record)"
+//	@Produce	json
+//	@Success	200	{object}	model.CakeResponse
+//	@Router		/cakes/{id} [get]
 func (d *CakeDelivery) GetCake(c *gin.Context) {
 	ctx := c.Request.Context()
 	idStr := c.Param("id")
@@ -60,6 +80,14 @@ func (d *CakeDelivery) GetCake(c *gin.Context) {
 	return
 }
 
+// CreateCake godoc
+//
+//	@Summary	CreateCake
+//	@Tags		cakes
+//	@Param		data	body	model.ApiMutationCakePayload	true	"body data".
+//	@Produce	json
+//	@Success	200	{object}	model.CakeMutationResponse
+//	@Router		/cakes [post]
 func (d *CakeDelivery) CreateCake(c *gin.Context) {
 	ctx := c.Request.Context()
 	var payload model.ApiMutationCakePayload
@@ -87,6 +115,14 @@ func (d *CakeDelivery) CreateCake(c *gin.Context) {
 	return
 }
 
+// DeleteCake godoc
+//
+//	@Summary	DeleteCake
+//	@Tags		cakes
+//	@Param		id	path	string	true	"param id (cake record)"
+//	@Produce	json
+//	@Success	200	{object}	model.CakeDeleteResponse
+//	@Router		/cakes/{id} [delete]
 func (d *CakeDelivery) DeleteCake(c *gin.Context) {
 	ctx := c.Request.Context()
 	idStr := c.Param("id")
@@ -104,6 +140,15 @@ func (d *CakeDelivery) DeleteCake(c *gin.Context) {
 	return
 }
 
+// UpdateCake godoc
+//
+//	@Summary	UpdateCake
+//	@Tags		cakes
+//	@Param		id		path	string							true	"param id (cake record)"
+//	@Param		data	body	model.ApiMutationCakePayload	true	"body data".
+//	@Produce	json
+//	@Success	200	{object}	model.CakeMutationResponse
+//	@Router		/cakes/{id} [put]
 func (d *CakeDelivery) UpdateCake(c *gin.Context) {
 	ctx := c.Request.Context()
 	idStr := c.Param("id")
