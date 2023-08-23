@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/forderation/ralali-test/internal/model"
-	_ "github.com/go-sql-driver/mysql"
 	"github.com/sirupsen/logrus"
 )
 

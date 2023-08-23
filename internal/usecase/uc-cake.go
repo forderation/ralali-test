@@ -3,6 +3,7 @@ package usecase
 import (
 	"context"
 	"errors"
+	"fmt"
 	"net/http"
 	"sync"
 	"time"
@@ -22,6 +23,68 @@ func NewCakeUsecase(dbCakeRepository *repository.CakeDBRepository) *CakeUsecase 
 	}
 }
 
+func (uc *CakeUsecase) DeleteCake(ctx context.Context, id int) (*model.CakeDeleteResponse, *model.ErrorResponse) {
+	_, errResponse := uc.GetDetailCake(ctx, id)
+	if errResponse != nil {
+		return nil, errResponse
+	}
+	err := uc.dbCakeRepository.SoftDeleteCake(ctx, id)
+	if err != nil {
+		return nil, &model.ErrorResponse{
+			HttpStatusCode: http.StatusInternalServerError,
+			Err:            errors.New("error delete cake data"),
+			ErrData: model.ErrorDetailResponse{
+				Detail: err.Error(),
+			},
+		}
+	}
+	return &model.CakeDeleteResponse{
+		ID: id,
+	}, nil
+}
+
+func (uc *CakeUsecase) UpdateCake(ctx context.Context, id int, payload model.CakePayloadQuery) (*model.CakeMutationResponse, *model.ErrorResponse) {
+	_, errResponse := uc.GetDetailCake(ctx, id)
+	if errResponse != nil {
+		return nil, errResponse
+	}
+	err := uc.dbCakeRepository.UpdateCake(ctx, id, payload)
+	if err != nil {
+		return nil, &model.ErrorResponse{
+			HttpStatusCode: http.StatusInternalServerError,
+			Err:            errors.New("error update cake data"),
+			ErrData: model.ErrorDetailResponse{
+				Detail: err.Error(),
+			},
+		}
+	}
+	return &model.CakeMutationResponse{
+		Title:       payload.Title,
+		Description: payload.Description,
+		Rating:      payload.Rating,
+		Image:       payload.Image,
+	}, nil
+}
+
+func (uc *CakeUsecase) CreateCake(ctx context.Context, payload model.CakePayloadQuery) (*model.CakeMutationResponse, *model.ErrorResponse) {
+	err := uc.dbCakeRepository.InsertCake(ctx, payload)
+	if err != nil {
+		return nil, &model.ErrorResponse{
+			HttpStatusCode: http.StatusInternalServerError,
+			Err:            errors.New("error add cake data"),
+			ErrData: model.ErrorDetailResponse{
+				Detail: err.Error(),
+			},
+		}
+	}
+	return &model.CakeMutationResponse{
+		Title:       payload.Title,
+		Description: payload.Description,
+		Rating:      payload.Rating,
+		Image:       payload.Image,
+	}, nil
+}
+
 func (uc *CakeUsecase) GetDetailCake(ctx context.Context, id int) (*model.CakeResponse, *model.ErrorResponse) {
 	cake, err := uc.dbCakeRepository.GetCake(ctx, id)
 	if err != nil {
@@ -36,7 +99,7 @@ func (uc *CakeUsecase) GetDetailCake(ctx context.Context, id int) (*model.CakeRe
 	if cake == nil {
 		return nil, &model.ErrorResponse{
 			HttpStatusCode: http.StatusNotFound,
-			Err:            errors.New("cake data not found"),
+			Err:            fmt.Errorf("cake data with id %d not found", id),
 		}
 	}
 	response := uc.MapCakeDataResponse(*cake)

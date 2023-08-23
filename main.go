@@ -30,6 +30,9 @@ func main() {
 	cakeRoutes := baseRoot.Group("/cakes")
 	cakeRoutes.GET("", cakeDelivery.GetCakes)
 	cakeRoutes.GET("/:id", cakeDelivery.GetCake)
+	cakeRoutes.POST("", cakeDelivery.CreateCake)
+	cakeRoutes.PUT("/:id", cakeDelivery.UpdateCake)
+	cakeRoutes.DELETE("/:id", cakeDelivery.DeleteCake)
 
 	address := ":8081"
 	srv := &http.Server{Addr: address, Handler: baseRoot}
@@ -44,8 +47,10 @@ func main() {
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
 	log.Println("shutdown service ...")
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx := context.Background()
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
+	closeMySQLDB(ctx, mySqlDB)
 	select {
 	case <-ctx.Done():
 	}
@@ -58,4 +63,11 @@ func initMysqlDB(dsn string) *sql.DB {
 		logrus.Panic("error init mysql db: ", err.Error())
 	}
 	return db
+}
+
+func closeMySQLDB(ctx context.Context, db *sql.DB) {
+	err := db.Close()
+	if err != nil {
+		log.Fatal("error on close mysqldb: ", err.Error())
+	}
 }
