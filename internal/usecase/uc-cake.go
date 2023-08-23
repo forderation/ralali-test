@@ -106,7 +106,7 @@ func (uc *CakeUsecase) MapCakeDataResponse(cake model.Cake) model.CakeResponse {
 		Description: cake.Description,
 		Rating:      cake.Rating,
 		Image:       cake.Image,
-		CreatedAt:   cake.CreatedAt.Format(time.RFC3339),
-		UpdatedAt:   cake.UpdatedAt.Format(time.RFC3339),
+		CreatedAt:   cake.CreatedAt.Local().Format(time.DateTime),
+		UpdatedAt:   cake.UpdatedAt.Local().Format(time.DateTime),
 	}
 }
