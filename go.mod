@@ -3,10 +3,12 @@ module github.com/forderation/ralali-test
 go 1.20
 
 require (
+	github.com/DATA-DOG/go-sqlmock v1.5.0
 	github.com/gin-gonic/gin v1.9.1
 	github.com/go-sql-driver/mysql v1.7.1
 	github.com/sirupsen/logrus v1.9.3
 	go.uber.org/mock v0.2.0
+	gopkg.in/guregu/null.v4 v4.0.0
 )
 
 require (
